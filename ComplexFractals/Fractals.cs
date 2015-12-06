@@ -1,6 +1,7 @@
 ﻿using FractalRenderer;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace ComplexFractals
         string pluginSubdir;
         Type rendererType;
         AbstractRenderer fractalRenderer;
+        Stopwatch timer;
 
         int currentTask;
 
@@ -21,9 +23,10 @@ namespace ComplexFractals
 
         public Fractals()
         {
-            InitializeComponent();
-
+            timer = new Stopwatch();
             pluginSubdir = Path.Combine(Directory.GetCurrentDirectory(), "Plugins");
+
+            InitializeComponent();
         }
 
         private void Fractals_Shown(object sender, EventArgs e)
@@ -230,6 +233,7 @@ namespace ComplexFractals
             }
 
             progressBar1.Maximum = 1000;
+            timer.Restart();
             currentTask = fractalRenderer.StartRenderAsync(pbFractal.Size, renderComplete, renderProgress, renderAborted);
             if (currentTask != 0)
             {
@@ -258,12 +262,13 @@ namespace ComplexFractals
         {
             if (currentTask == task)
             {
+                timer.Stop();
                 Invoke(new Action(() =>
                 {
                     progressBar1.Value = 0;
                     pbFractal.Image = result;
                     pbPreview.Image = result;
-                    SetStatus("Completed render");
+                    SetStatus("Completed render ({0})", timer.Elapsed);
                 }));
             }
         }

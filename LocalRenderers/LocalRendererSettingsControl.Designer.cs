@@ -43,6 +43,7 @@
             this.textBox4 = new System.Windows.Forms.TextBox();
             this.flpPalette = new System.Windows.Forms.FlowLayoutPanel();
             this.cbThreads = new System.Windows.Forms.CheckBox();
+            this.cbBulbs = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.nmrIter)).BeginInit();
             this.SuspendLayout();
             // 
@@ -174,9 +175,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.flpPalette.AutoScroll = true;
             this.flpPalette.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.flpPalette.Location = new System.Drawing.Point(3, 210);
+            this.flpPalette.Location = new System.Drawing.Point(3, 233);
             this.flpPalette.Name = "flpPalette";
-            this.flpPalette.Size = new System.Drawing.Size(171, 182);
+            this.flpPalette.Size = new System.Drawing.Size(171, 159);
             this.flpPalette.TabIndex = 12;
             this.flpPalette.SizeChanged += new System.EventHandler(this.flpPalette_SizeChanged);
             this.flpPalette.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.flpPalette_MouseDoubleClick);
@@ -186,17 +187,30 @@
             this.cbThreads.AutoSize = true;
             this.cbThreads.Checked = true;
             this.cbThreads.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbThreads.Location = new System.Drawing.Point(74, 187);
+            this.cbThreads.Location = new System.Drawing.Point(6, 187);
             this.cbThreads.Name = "cbThreads";
             this.cbThreads.Size = new System.Drawing.Size(100, 17);
             this.cbThreads.TabIndex = 0;
             this.cbThreads.Text = "Multiple threads";
             this.cbThreads.UseVisualStyleBackColor = true;
             // 
+            // checkBox1
+            // 
+            this.cbBulbs.AutoSize = true;
+            this.cbBulbs.Checked = true;
+            this.cbBulbs.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbBulbs.Location = new System.Drawing.Point(6, 210);
+            this.cbBulbs.Name = "checkBox1";
+            this.cbBulbs.Size = new System.Drawing.Size(121, 17);
+            this.cbBulbs.TabIndex = 13;
+            this.cbBulbs.Text = "Check primary bulbs";
+            this.cbBulbs.UseVisualStyleBackColor = true;
+            // 
             // LocalRendererSettingsControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.cbBulbs);
             this.Controls.Add(this.cbThreads);
             this.Controls.Add(this.flpPalette);
             this.Controls.Add(this.textBox3);
@@ -235,5 +249,6 @@
         private System.Windows.Forms.TextBox textBox4;
         private System.Windows.Forms.FlowLayoutPanel flpPalette;
         private System.Windows.Forms.CheckBox cbThreads;
+        private System.Windows.Forms.CheckBox cbBulbs;
     }
 }

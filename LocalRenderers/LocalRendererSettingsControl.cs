@@ -37,19 +37,22 @@ namespace LocalRenderers
             texts.Add(textBox3, "");
             texts.Add(textBox4, "");
 
-            /*
+            // 13.5 sec
             textBox1.Text = (-2.5).ToString();
             textBox2.Text = (-1.2).ToString();
             textBox3.Text = (+1.5).ToString();
             textBox4.Text = (+1.2).ToString();
-            */
+            
+            /*
             textBox1.Text = (-5).ToString();
             textBox2.Text = (-5).ToString();
             textBox3.Text = (+5).ToString();
             textBox4.Text = (+5).ToString();
+            */
 
             LoadPalette();
         }
+
 
         public int Iterations
         {
@@ -123,6 +126,15 @@ namespace LocalRenderers
                 return cbThreads.Checked;
             }
         }
+
+        public bool BulbChecking
+        {
+            get
+            {
+                return cbBulbs.Checked;
+            }
+        }
+
 
         private void LoadPalette()
         {
@@ -212,8 +224,7 @@ namespace LocalRenderers
             OnSettingsChanged(true);
         }
 
-
-
+        
         private void flpPalette_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             AddControl(Color.White);

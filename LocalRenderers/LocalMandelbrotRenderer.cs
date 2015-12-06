@@ -150,19 +150,33 @@ namespace LocalRenderers
                         double rr = r * r;
                         double ii = i * i;
 
-                        int iter = 0;
-                        while (iter < options.Iterations && (rr + ii) < bailsqr)
+                        double distsqr = rr + ii;
+                        bool inset = false;
+                        if (options.BulbChecking)
                         {
-                            i = r * i;
-                            i = i + i + ci;
-                            r = rr - ii + cr;
+                            // q = (r - 0.25)^2 + ii = rr - r - 0.0625 + ii = distsqr - r - 0.0625
+                            double q = distsqr - r / 2 + 0.0625;
+                            inset = (q * (q + (r - 0.25)) < ii / 4.0 ||
+                                     distsqr + 2 * r < -0.9375);
+                        }
 
-                            rr = r * r;
-                            ii = i * i;
-                            iter++;
+                        int iter = 0;
+                        if (!inset)
+                        {
+                            while (iter < options.Iterations && (distsqr) < bailsqr)
+                            {
+                                i = r * i;
+                                i = i + i + ci;
+                                r = rr - ii + cr;
+
+                                rr = r * r;
+                                ii = i * i;
+                                distsqr = rr + ii;
+                                iter++;
+                            }
                         }
                         byte red, grn, blu;
-                        if (iter < options.Iterations)
+                        if (!inset && iter < options.Iterations)
                         {
                             switch (options.Coloring) // Branch prediction will guess correctly after a few tries, right?   
                             {
@@ -218,7 +232,7 @@ namespace LocalRenderers
                     }
 
                     int rows = Interlocked.Increment(ref rowsDone);
-                    if (options.TaskProgress != null)
+                    if (rows % 32 == 0 && options.TaskProgress != null)
                         options.TaskProgress(tasknum, options.User, rows / (float)bd.Height);
                 }
             });
@@ -270,6 +284,7 @@ namespace LocalRenderers
             opt.Coloring = settingsControl.Coloring;
             opt.Iterations = settingsControl.Iterations;
             opt.SuperSampling = settingsControl.Sampling;
+            opt.BulbChecking = settingsControl.BulbChecking;
             opt.MultiThreaded = settingsControl.Multithreaded;
             return opt;
         }
