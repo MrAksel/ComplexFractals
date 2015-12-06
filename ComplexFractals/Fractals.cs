@@ -284,10 +284,5 @@ namespace ComplexFractals
         {
             lblStatus.Text = string.Format(format, args);
         }
-
-        private void Fractals_SizeChanged(object sender, EventArgs e)
-        {
-            RedrawPreview();
-        }
     }
 }

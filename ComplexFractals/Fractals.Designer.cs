@@ -183,7 +183,6 @@
             this.Name = "Fractals";
             this.Text = "Complex fractals";
             this.Shown += new System.EventHandler(this.Fractals_Shown);
-            this.SizeChanged += new System.EventHandler(this.Fractals_SizeChanged);
             ((System.ComponentModel.ISupportInitialize)(this.pbPreview)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbFractal)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.fsWatch)).EndInit();

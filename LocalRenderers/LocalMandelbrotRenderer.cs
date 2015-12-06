@@ -120,7 +120,7 @@ namespace LocalRenderers
             double rinc = (options.RealMax - options.RealMin) / bd.Width;
             double iinc = (options.ImagMax - options.ImagMin) / bd.Height;
 
-            // TODO Supersampling, bulb checking, fixing smooth iter count, threading
+            // TODO Supersampling, bulb checking
             int rowsDone = 0;
             Action<Tuple<int, int, int, int>> worker = new Action<Tuple<int, int, int, int>>((offset) =>
             {
@@ -143,8 +143,8 @@ namespace LocalRenderers
                     for (int x = xoff; x < bd.Width; x += xjmp)
                     {
                         double mappedr = (double)x / bd.Width * (options.RealMax - options.RealMin) + options.RealMin;
-
                         double cr = mappedr;
+
                         double r = cr;
                         double i = ci;
                         double rr = r * r;
@@ -154,11 +154,8 @@ namespace LocalRenderers
                         while (iter < options.Iterations && (rr + ii) < bailsqr)
                         {
                             i = r * i;
-                            i = i + i + ci; // 2 * r * i + ci
+                            i = i + i + ci;
                             r = rr - ii + cr;
-                            //tmp = rr - ii + cr;
-                            //i = 2 * r * i + ci;
-                            //r = tpr;
 
                             rr = r * r;
                             ii = i * i;
@@ -293,9 +290,7 @@ namespace LocalRenderers
                     tuples.Add(t);
                 }
             }
-
-            string msg = string.Join("\n", tuples.Select(t => string.Format("{0}+{1} {2}+{3}", t.Item1, t.Item2, t.Item3, t.Item4)).ToArray());
-            System.Diagnostics.Debug.WriteLine(msg);
+            
             return tuples;
         }
 

@@ -13,6 +13,7 @@
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
+            SavePalette();
             if (disposing && (components != null))
             {
                 components.Dispose();
@@ -171,10 +172,13 @@
             this.flpPalette.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.flpPalette.AutoScroll = true;
+            this.flpPalette.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.flpPalette.Location = new System.Drawing.Point(3, 210);
             this.flpPalette.Name = "flpPalette";
             this.flpPalette.Size = new System.Drawing.Size(171, 182);
             this.flpPalette.TabIndex = 12;
+            this.flpPalette.SizeChanged += new System.EventHandler(this.flpPalette_SizeChanged);
             this.flpPalette.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.flpPalette_MouseDoubleClick);
             // 
             // cbThreads

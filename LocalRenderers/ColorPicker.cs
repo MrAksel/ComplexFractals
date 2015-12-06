@@ -17,15 +17,28 @@ namespace LocalRenderers
                 btnClear.ForeColor = Color.White;
             else
                 btnClear.ForeColor = Color.Black;
+
+            if (OnColorChanged != null)
+                OnColorChanged(this);
         }
 
-        public event OnRemovalEvent OnRemoval;
-        public delegate void OnRemovalEvent(ColorPicker picker);
+
+        public event ColorPickerEvent OnRemoval;
+        public event ColorPickerEvent OnColorChanged;
+        public delegate void ColorPickerEvent(ColorPicker picker);
 
         private void btnClear_Click(object sender, EventArgs e)
         {
             if (OnRemoval != null)
                 OnRemoval(this);
+        }
+
+        private void ColorPicker_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (cd1.ShowDialog() == DialogResult.OK)
+            {
+                BackColor = cd1.Color;
+            }
         }
     }
 }
