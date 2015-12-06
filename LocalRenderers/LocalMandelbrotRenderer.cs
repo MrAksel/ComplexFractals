@@ -131,7 +131,7 @@ namespace LocalRenderers
 
                 int bailout = short.MaxValue;
                 int bailsqr = bailout * bailout;
-                double lnbail = Math.Log(bailout);
+                double ln2lnbailoverln2 = 1 + Math.Log(Math.Log(bailout)) / ln2; // ln (2 * ln(bailout)) / ln2 = (ln2 + ln(ln(bailout))) / ln2 = 1 + ln(ln(bailout)) / ln2
 
                 for (int y = yoff; y < bd.Height; y += yjmp)
                 {
@@ -178,7 +178,7 @@ namespace LocalRenderers
                                     }
                                 case ColoringAlgorithm.SmoothIterGray:
                                     {
-                                        double smooth = iter + 1 + Math.Log(lnbail / Math.Log(Math.Sqrt(rr + ii))) / ln2;
+                                        double smooth = iter + 1 + ln2lnbailoverln2 - Math.Log(Math.Log(rr + ii)) / ln2;
                                         double p2 = smooth % 1;
                                         double p1 = 1 - p2;
                                         byte val = (byte)((iter * 255 * p1 + (iter + 1) * 255 * p2) / options.Iterations);
@@ -196,7 +196,7 @@ namespace LocalRenderers
                                     }
                                 case ColoringAlgorithm.SmoothIterPalette:
                                     {
-                                        double smooth = iter + 1 + Math.Log(lnbail / Math.Log(Math.Sqrt(rr + ii))) / ln2;
+                                        double smooth = iter + 1 + ln2lnbailoverln2 - Math.Log(Math.Log(rr + ii)) / ln2;
                                         double p2 = smooth % 1;
                                         double p1 = 1 - p2;
                                         int min = (int)smooth % options.Palette.Length + options.Palette.Length;
