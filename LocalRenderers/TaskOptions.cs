@@ -11,7 +11,7 @@ namespace LocalRenderers
         public int Iterations { get; set; }
         public Size Size { get; set; }
         public ColoringAlgorithm Coloring { get; set; }
-        public SuperSampling SuperSampling { get; set; }
+        public Size AntiAliasingScale { get; set; }
         public AbstractRenderer.RenderAborted TaskAborted { get; set; }
         public AbstractRenderer.RenderComplete TaskComplete { get; set; }
         public AbstractRenderer.RenderProgress TaskProgress { get; set; }
@@ -28,6 +28,15 @@ namespace LocalRenderers
         public double ImagMin { get { return Min.Imaginary; } }
         public double ImagMax { get { return Max.Imaginary; } }
 
+        public Size ActualRenderSize
+        {
+            get
+            {
+                return new Size(Size.Width * AntiAliasingScale.Width,
+                                Size.Height * AntiAliasingScale.Height);
+            }
+        }
+
         public int Area
         {
             get
@@ -43,12 +52,12 @@ namespace LocalRenderers
             opt.Updates = Updates;
             opt.Size = Size;
             opt.Coloring = Coloring;
-            opt.SuperSampling = SuperSampling;
             opt.TaskAborted = TaskAborted;
             opt.TaskComplete = TaskComplete;
             opt.TaskProgress = TaskProgress;
             opt.BulbChecking = BulbChecking;
             opt.MultiThreaded = MultiThreaded;
+            opt.AntiAliasingScale = AntiAliasingScale;
             opt.User = User;
 
             if (Palette != null)

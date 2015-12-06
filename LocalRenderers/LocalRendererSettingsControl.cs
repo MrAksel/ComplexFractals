@@ -22,34 +22,24 @@ namespace LocalRenderers
             nmrUpdates.Maximum = int.MaxValue;
 
             cbColoring.Items.AddRange(Enum.GetNames(typeof(ColoringAlgorithm)));
-
-            cbSampling.Items.Add(SuperSampling.OneByOne);
-            cbSampling.Items.Add(SuperSampling.ThreeByThree);
-            cbSampling.Items.Add(SuperSampling.ThreeByThreeCross);
-            cbSampling.Items.Add(SuperSampling.FiveByFive);
-            cbSampling.Items.Add(SuperSampling.FiveByFiveCross);
-
+            
             cbColoring.SelectedIndex = 3;
-            cbSampling.SelectedIndex = 0;
-
+            
             texts = new Dictionary<TextBox, string>();
             texts.Add(textBox1, "");
             texts.Add(textBox2, "");
             texts.Add(textBox3, "");
             texts.Add(textBox4, "");
-
-            // 13.5 sec
+            texts.Add(tbssW, "");
+            texts.Add(tbssH, "");
+            
             textBox1.Text = (-2.5).ToString();
             textBox2.Text = (-1.2).ToString();
             textBox3.Text = (+1.5).ToString();
             textBox4.Text = (+1.2).ToString();
 
-            /*
-            textBox1.Text = (-5).ToString();
-            textBox2.Text = (-5).ToString();
-            textBox3.Text = (+5).ToString();
-            textBox4.Text = (+5).ToString();
-            */
+            tbssW.Text = "2";
+            tbssH.Text = "2";
 
             LoadPalette();
         }
@@ -83,19 +73,11 @@ namespace LocalRenderers
             }
         }
 
-        public SuperSampling Sampling
+        public Size FullSizeAAScaler
         {
             get
             {
-                switch (cbSampling.SelectedItem.ToString())
-                {
-                    case "One by one": return SuperSampling.OneByOne;
-                    case "Three by three": return SuperSampling.ThreeByThree;
-                    case "Three by three cross": return SuperSampling.ThreeByThreeCross;
-                    case "Five by five": return SuperSampling.FiveByFive;
-                    case "Five by five cross": return SuperSampling.FiveByFiveCross;
-                    default: return SuperSampling.OneByOne;
-                }
+                return new Size(int.Parse(tbssW.Text), int.Parse(tbssH.Text));
             }
         }
 
@@ -283,6 +265,27 @@ namespace LocalRenderers
             foreach (Control cp in flpPalette.Controls)
             {
                 cp.Width = flpPalette.Width - 8 - SystemInformation.VerticalScrollBarWidth;
+            }
+        }
+
+        private void tbssH_TextChanged(object sender, EventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+            if (tb == null)
+                return;
+
+            uint val;
+            string text = tb.Text;
+            bool paresable = uint.TryParse(text, out val);
+
+            if (!paresable)
+            {
+                tb.Text = texts[tb]; // Reset text
+            }
+            else
+            {
+                texts[tb] = tb.Text; // Update cache
+                OnSettingsChanged(true);
             }
         }
     }

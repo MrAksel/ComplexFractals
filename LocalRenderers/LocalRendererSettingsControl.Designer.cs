@@ -34,7 +34,6 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.cbColoring = new System.Windows.Forms.ComboBox();
-            this.cbSampling = new System.Windows.Forms.ComboBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
@@ -46,6 +45,9 @@
             this.cbBulbs = new System.Windows.Forms.CheckBox();
             this.nmrUpdates = new System.Windows.Forms.NumericUpDown();
             this.label6 = new System.Windows.Forms.Label();
+            this.tbssW = new System.Windows.Forms.TextBox();
+            this.tbssH = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.nmrIter)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nmrUpdates)).BeginInit();
             this.SuspendLayout();
@@ -102,16 +104,6 @@
             this.cbColoring.Size = new System.Drawing.Size(112, 21);
             this.cbColoring.TabIndex = 4;
             this.cbColoring.SelectedIndexChanged += new System.EventHandler(this.other_changed);
-            // 
-            // cbSampling
-            // 
-            this.cbSampling.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbSampling.FormattingEnabled = true;
-            this.cbSampling.Location = new System.Drawing.Point(82, 82);
-            this.cbSampling.Name = "cbSampling";
-            this.cbSampling.Size = new System.Drawing.Size(92, 21);
-            this.cbSampling.TabIndex = 5;
             // 
             // label4
             // 
@@ -232,10 +224,38 @@
             this.label6.TabIndex = 14;
             this.label6.Text = "Update frequency:";
             // 
+            // tbssW
+            // 
+            this.tbssW.Location = new System.Drawing.Point(83, 82);
+            this.tbssW.Name = "tbssW";
+            this.tbssW.Size = new System.Drawing.Size(33, 20);
+            this.tbssW.TabIndex = 16;
+            this.tbssW.TextChanged += new System.EventHandler(this.tbssH_TextChanged);
+            // 
+            // tbssH
+            // 
+            this.tbssH.Location = new System.Drawing.Point(140, 82);
+            this.tbssH.Name = "tbssH";
+            this.tbssH.Size = new System.Drawing.Size(33, 20);
+            this.tbssH.TabIndex = 17;
+            this.tbssH.TextChanged += new System.EventHandler(this.tbssH_TextChanged);
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(122, 85);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(12, 13);
+            this.label7.TabIndex = 18;
+            this.label7.Text = "x";
+            // 
             // LocalRendererSettingsControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.tbssH);
+            this.Controls.Add(this.tbssW);
             this.Controls.Add(this.nmrUpdates);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.cbBulbs);
@@ -247,7 +267,6 @@
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
-            this.Controls.Add(this.cbSampling);
             this.Controls.Add(this.cbColoring);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
@@ -269,7 +288,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ComboBox cbColoring;
-        private System.Windows.Forms.ComboBox cbSampling;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox textBox1;
@@ -281,5 +299,8 @@
         private System.Windows.Forms.CheckBox cbBulbs;
         private System.Windows.Forms.NumericUpDown nmrUpdates;
         private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.TextBox tbssW;
+        private System.Windows.Forms.TextBox tbssH;
+        private System.Windows.Forms.Label label7;
     }
 }

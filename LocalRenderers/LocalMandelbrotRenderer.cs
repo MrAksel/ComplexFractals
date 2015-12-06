@@ -5,8 +5,8 @@ using System.Drawing.Imaging;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
 using System.Numerics;
+using System.Collections.Concurrent;
 
 namespace LocalRenderers
 {
@@ -15,13 +15,13 @@ namespace LocalRenderers
     {
         private const double ln2 = 0.693147180559945309417232121458176568075500134360255254120680; // Didn't bother with truncating the digits..
 
-        private SynchronizedCollection<int> activeTasks;
+        private CancellationTokenSource tokenSource;
+        private ConcurrentDictionary<int, CancellationTokenSource> activeTasks;
         private LocalRendererSettingsControl settingsControl;
-
 
         public LocalMandelbrotRenderer()
         {
-            activeTasks = new SynchronizedCollection<int>();
+            activeTasks = new ConcurrentDictionary<int, CancellationTokenSource>();
             settingsControl = new LocalRendererSettingsControl();
         }
 
@@ -33,7 +33,10 @@ namespace LocalRenderers
 
         public override void AbortRender(int task)
         {
-            activeTasks.Remove(task);
+            if (activeTasks.ContainsKey(task))
+            {
+                activeTasks[task].Cancel();
+            }
         }
 
         public override Bitmap DrawPreview(Size size)
@@ -50,14 +53,20 @@ namespace LocalRenderers
 
         public Bitmap DrawFractal(TaskOptions opt)
         {
-            int retcode = 0;
+            bool success = false;
             Bitmap bmref = null;
             ManualResetEvent set = new ManualResetEvent(false);
 
-            RenderComplete cb = new RenderComplete((tnum, ret, usr, bm) =>
+            RenderComplete cb = new RenderComplete((tnum, usr, bm) =>
             {
-                retcode = ret;
+                success = true;
                 bmref = bm; // TODO Should maybe check whether tnum == task
+                set.Set();
+            });
+
+            RenderAborted ab = new RenderAborted((tnum, usr) =>
+            {
+                success = false;
                 set.Set();
             });
 
@@ -66,9 +75,12 @@ namespace LocalRenderers
             int task = StartRenderAsync(opt);
             set.WaitOne();
 
-            // TODO Handle retcode
+            opt.TaskComplete = opt.TaskComplete - cb;
 
-            return bmref;
+            if (success)
+                return bmref;
+            else
+                return null;
         }
 
         public override int StartRenderAsync(Size size, RenderComplete completeCallback, RenderProgress progressCallback, RenderAborted abortedCallback, object user)
@@ -91,13 +103,16 @@ namespace LocalRenderers
             if (options.Area == 0)
                 return 0;
 
+            CancellationTokenSource source = new CancellationTokenSource();
+
             int tasknum = GetTaskNumber();
-            activeTasks.Add(tasknum);
+            while (!activeTasks.TryAdd(tasknum, source))
+                tasknum = GetTaskNumber();
 
             TaskOptions taskopt = options.Clone();
             WaitCallback task = new WaitCallback(delegate
             {
-                RenderTaskAsync(taskopt, tasknum);
+                RenderTaskAsync(taskopt, tasknum, source.Token);
             });
             ThreadPool.QueueUserWorkItem(task);
 
@@ -105,15 +120,15 @@ namespace LocalRenderers
         }
 
 
-        private unsafe void RenderTaskAsync(TaskOptions options, int tasknum)
+        private unsafe void RenderTaskAsync(TaskOptions options, int tasknum, CancellationToken cancelToken)
         {
-            int retcode = 0;
-            Bitmap res = new Bitmap(options.Size.Width, options.Size.Height, PixelFormat.Format24bppRgb);
+            bool canceled = false;
+            Bitmap res = new Bitmap(options.ActualRenderSize.Width, options.ActualRenderSize.Height, PixelFormat.Format24bppRgb);
 
             if (options.Iterations == 0)
                 goto finished;
 
-            BitmapData bd = res.LockBits(new Rectangle(Point.Empty, options.Size), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+            BitmapData bd = res.LockBits(new Rectangle(Point.Empty, options.ActualRenderSize), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
 
             byte* start = (byte*)bd.Scan0.ToPointer();
             int pxsize = 3;
@@ -121,7 +136,7 @@ namespace LocalRenderers
             double rinc = (options.RealMax - options.RealMin) / bd.Width;
             double iinc = (options.ImagMax - options.ImagMin) / bd.Height;
 
-            // TODO Supersampling, bulb checking
+            // TODO Supersampling. How about you rather buy some more RAM and render at a higher resolution? Heh
             bool progress = options.TaskProgress != null && options.Updates > 0;
             int pxDone = 0;
             float pxTot = bd.Width * bd.Height;
@@ -134,11 +149,11 @@ namespace LocalRenderers
                 int yoff = offset.Item3;
                 int yjmp = offset.Item4;
 
-                int bailout = short.MaxValue;
+                int bailout = short.MaxValue; //short.MaxValue;
                 int bailsqr = bailout * bailout;
                 double ln2lnbailoverln2 = 1 + Math.Log(Math.Log(bailout)) / ln2; // ln (2 * ln(bailout)) / ln2 = (ln2 + ln(ln(bailout))) / ln2 = 1 + ln(ln(bailout)) / ln2
 
-                for (int y = yoff; y < bd.Height; y += yjmp)
+                for (int y = yoff; y < bd.Height && !cancelToken.IsCancellationRequested; y += yjmp)
                 {
                     double mappedi = (double)y / bd.Height * (options.ImagMax - options.ImagMin) + options.ImagMin;
                     double ci = mappedi;
@@ -247,6 +262,10 @@ namespace LocalRenderers
                         }
                     }
                 }
+                if (cancelToken.IsCancellationRequested)
+                {
+                    canceled = true;
+                }
             });
 
             if (options.MultiThreaded)
@@ -263,12 +282,25 @@ namespace LocalRenderers
 
             finished:
 
-            if (options.TaskProgress != null)
-                options.TaskProgress(tasknum, options.User, 1f);
+            if (!canceled)
+            {
+                res = new Bitmap(res, options.Size);
 
-            if (options.TaskComplete != null)
-                options.TaskComplete(tasknum, retcode, options.User, res);
+                if (options.TaskProgress != null)
+                    options.TaskProgress(tasknum, options.User, 1f);
+
+                if (options.TaskComplete != null)
+                    options.TaskComplete(tasknum, options.User, res);
+            }
+            else
+            {
+                if (options.TaskAborted != null)
+                {
+                    options.TaskAborted(tasknum, options.User);
+                }
+            }
         }
+
 
         private TaskOptions CreatePreviewOptions(Size size)
         {
@@ -279,7 +311,7 @@ namespace LocalRenderers
             if (opt.Coloring == ColoringAlgorithm.SmoothIterGray)
                 opt.Coloring = ColoringAlgorithm.FastIterGray;
 
-            opt.SuperSampling = SuperSampling.OneByOne;
+            opt.AntiAliasingScale = new Size(1, 1);
             opt.Iterations = (int)Math.Pow(settingsControl.Iterations, 2.0 / 3.0);
             opt.MultiThreaded = false;
 
@@ -296,9 +328,9 @@ namespace LocalRenderers
             opt.Palette = settingsControl.Palette;
             opt.Coloring = settingsControl.Coloring;
             opt.Iterations = settingsControl.Iterations;
-            opt.SuperSampling = settingsControl.Sampling;
             opt.BulbChecking = settingsControl.BulbChecking;
             opt.MultiThreaded = settingsControl.Multithreaded;
+            opt.AntiAliasingScale = settingsControl.FullSizeAAScaler;
             return opt;
         }
 

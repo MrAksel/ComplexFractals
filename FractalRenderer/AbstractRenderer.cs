@@ -37,8 +37,8 @@ namespace FractalRenderer
 
 
         public delegate void RenderProgress(int task, object user, float percentage);
-        public delegate void RenderComplete(int task, int returnCode, object user, Bitmap result);
-        public delegate void RenderAborted(int task, int returnCode, object user);
+        public delegate void RenderComplete(int task, object user, Bitmap result);
+        public delegate void RenderAborted(int task, object user);
 
 
         private int currTaskNum = 1;

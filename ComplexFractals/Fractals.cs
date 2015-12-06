@@ -279,7 +279,7 @@ namespace ComplexFractals
             }
         }
 
-        private void renderComplete(int task, int retcode, object user, Bitmap result)
+        private void renderComplete(int task, object user, Bitmap result)
         {
             if (currentTask == task)
             {
@@ -294,10 +294,11 @@ namespace ComplexFractals
             }
         }
 
-        private void renderAborted(int task, int retcode, object user)
+        private void renderAborted(int task, object user)
         {
             if (currentTask == task)
             {
+                timer.Stop();
                 currentTask = 0;
                 Invoke(new Action(() =>
                 {
