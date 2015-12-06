@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Numerics;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -8,6 +9,12 @@ namespace FractalRenderer
     public abstract class AbstractRenderer
     {
         public abstract SettingsWindow GetSettingsWindow();
+
+        public abstract bool SupportsZooming();
+        public abstract Complex PointToComplex(Point onRealPlane, Size planeSize);
+        public abstract Complex PointToRealPlane(Complex onImagPlane, Size planeSize);
+        public abstract void SetClip(Complex min, Complex max);
+        public abstract void GetClip(out Complex min, out Complex max);
 
         public abstract Bitmap DrawPreview(Size size);
         public abstract Bitmap DrawFractal(Size size);

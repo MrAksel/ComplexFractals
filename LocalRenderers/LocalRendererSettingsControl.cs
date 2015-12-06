@@ -105,6 +105,11 @@ namespace LocalRenderers
             {
                 return new Complex(double.Parse(textBox1.Text), double.Parse(textBox2.Text));
             }
+            set
+            {
+                textBox1.Text = value.Real.ToString();
+                textBox2.Text = value.Imaginary.ToString();
+            }
         }
 
         public Complex Max
@@ -112,6 +117,11 @@ namespace LocalRenderers
             get
             {
                 return new Complex(double.Parse(textBox3.Text), double.Parse(textBox4.Text));
+            }
+            set
+            {
+                textBox3.Text = value.Real.ToString();
+                textBox4.Text = value.Imaginary.ToString();
             }
         }
 

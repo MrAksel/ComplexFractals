@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Numerics;
 
 namespace LocalRenderers
 {
@@ -335,6 +336,40 @@ namespace LocalRenderers
                     s_b = b;
                 }
             }
+        }
+
+
+        public override bool SupportsZooming()
+        {
+            return true;
+        }
+
+        public override Complex PointToComplex(Point onPlane, Size planeSize)
+        {
+            double cx = onPlane.X / (double)planeSize.Width * (settingsControl.Max.Real - settingsControl.Min.Real) + settingsControl.Min.Real;
+            double cy = onPlane.Y / (double)planeSize.Height * (settingsControl.Max.Imaginary - settingsControl.Min.Imaginary) + settingsControl.Min.Imaginary;
+
+            return new Complex(cx, cy);
+        }
+
+        public override Complex PointToRealPlane(Complex onPlane, Size planeSize)
+        {
+            double x = (onPlane.Real - settingsControl.Min.Real) / (settingsControl.Max.Real - settingsControl.Min.Real) * planeSize.Width;
+            double y = (onPlane.Imaginary - settingsControl.Min.Imaginary) / (settingsControl.Max.Imaginary - settingsControl.Min.Imaginary) * planeSize.Height;
+
+            return new Complex(x, y);
+        }
+
+        public override void SetClip(Complex min, Complex max)
+        {
+            settingsControl.Min = min;
+            settingsControl.Max = max;
+        }
+
+        public override void GetClip(out Complex min, out Complex max)
+        {
+            min = settingsControl.Min;
+            max = settingsControl.Max;
         }
     }
 }

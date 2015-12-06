@@ -127,6 +127,10 @@
             this.pbFractal.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pbFractal.TabIndex = 7;
             this.pbFractal.TabStop = false;
+            this.pbFractal.Paint += new System.Windows.Forms.PaintEventHandler(this.pbFractal_Paint);
+            this.pbFractal.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pbFractal_MouseDown);
+            this.pbFractal.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pbFractal_MouseMove);
+            this.pbFractal.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pbFractal_MouseUp);
             // 
             // progressBar1
             // 

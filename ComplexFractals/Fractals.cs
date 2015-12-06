@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Reflection;
 using System.Windows.Forms;
 
@@ -17,14 +18,25 @@ namespace ComplexFractals
         AbstractRenderer fractalRenderer;
         Stopwatch timer;
 
+        Point pMouseDown; // Location on preview picturebox
+        Point rMouseDown; // Location on render picturebox
+        Point pMousePos;
+        Point rMousePos;
+
         int currentTask;
+
+        Stack<Tuple<Complex, Complex>> zooms;
 
         private Dictionary<string, Dictionary<string, Type>> renderers;
 
         public Fractals()
         {
+            zooms = new Stack<Tuple<Complex, Complex>>();
             timer = new Stopwatch();
             pluginSubdir = Path.Combine(Directory.GetCurrentDirectory(), "Plugins");
+
+            pMouseDown = rMouseDown = new Point(-1, -1);
+            pMousePos = rMousePos = new Point(-1, -1);
 
             InitializeComponent();
         }
@@ -201,9 +213,18 @@ namespace ComplexFractals
                 settings.Dock = DockStyle.Fill;
             }
 
+            if (fractalRenderer.SupportsZooming())
+            {
+                zooms.Clear();
+
+                Complex min, max;
+                fractalRenderer.GetClip(out min, out max);
+                zooms.Push(new Tuple<Complex, Complex>(min, max));
+            }
+
             RedrawPreview();
         }
-        
+
         private void RedrawPreview()
         {
             if (fractalRenderer == null)
@@ -288,6 +309,69 @@ namespace ComplexFractals
         private void SetStatus(string format, params object[] args)
         {
             lblStatus.Text = string.Format(format, args);
+        }
+
+
+        private void pbFractal_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left && fractalRenderer != null && fractalRenderer.SupportsZooming())
+            {
+                pMouseDown = pbFractal.PointToClient(MousePosition);
+            }
+        }
+
+        private void pbFractal_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left && pMouseDown.X > 0 && fractalRenderer != null && fractalRenderer.SupportsZooming())
+            {
+                pMousePos = pbFractal.PointToClient(MousePosition);
+                pbFractal.Invalidate();
+            }
+        }
+
+        private void pbFractal_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left && pMouseDown.X > 0 && fractalRenderer != null && fractalRenderer.SupportsZooming())
+            {
+                pMousePos = pbFractal.PointToClient(MousePosition);
+                int l = Math.Min(pMouseDown.X, pMousePos.X);
+                int t = Math.Min(pMouseDown.Y, pMousePos.Y);
+                int r = Math.Max(pMouseDown.X, pMousePos.X);
+                int b = Math.Max(pMouseDown.Y, pMousePos.Y);
+
+                Complex min = fractalRenderer.PointToComplex(new Point(l, t), pbFractal.Size);
+                Complex max = fractalRenderer.PointToComplex(new Point(r, b), pbFractal.Size);
+
+                pMouseDown = pMousePos = new Point(-1, -1);
+
+                zooms.Push(new Tuple<Complex, Complex>(min, max));
+                fractalRenderer.SetClip(min, max);
+                RedrawFractal();
+            }
+            else if (e.Button == MouseButtons.Right && fractalRenderer != null && fractalRenderer.SupportsZooming())
+            {
+                if (zooms.Count > 1)
+                {
+                    zooms.Pop();
+                    Tuple<Complex, Complex> zoom = zooms.Peek();
+                    fractalRenderer.SetClip(zoom.Item1, zoom.Item2);
+                    RedrawFractal();
+                }
+            }
+        }
+
+        private void pbFractal_Paint(object sender, PaintEventArgs e)
+        {
+            if (pMouseDown.X >= 0)
+            {
+                int l = Math.Min(pMouseDown.X, pMousePos.X);
+                int t = Math.Min(pMouseDown.Y, pMousePos.Y);
+                int r = Math.Max(pMouseDown.X, pMousePos.X);
+                int b = Math.Max(pMouseDown.Y, pMousePos.Y);
+                Rectangle zoomed = Rectangle.FromLTRB(l, t, r, b);
+
+                e.Graphics.DrawRectangle(Pens.Gold, zoomed);
+            }
         }
     }
 }
