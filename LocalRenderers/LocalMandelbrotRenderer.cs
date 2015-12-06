@@ -129,7 +129,7 @@ namespace LocalRenderers
                 int yoff = offset.Item3;
                 int yjmp = offset.Item4;
 
-                int bailout = 2;
+                int bailout = short.MaxValue;
                 int bailsqr = bailout * bailout;
                 double lnbail = Math.Log(bailout);
 
@@ -178,11 +178,10 @@ namespace LocalRenderers
                                     }
                                 case ColoringAlgorithm.SmoothIterGray:
                                     {
-                                        double p1 = Math.Log(Math.Log(rr + ii)) / ln2; // Smooth iteration algorithm from wikipedia, simplified by WolframAlpha
-                                        double p2 = 1 - p1;
-                                        int min = iter;
-                                        int max = iter + 1;
-                                        byte val = (byte)(iter * 255 * p1 + max * 255 * p2);
+                                        double smooth = iter + 1 + Math.Log(lnbail / Math.Log(Math.Sqrt(rr + ii))) / ln2;
+                                        double p2 = smooth % 1;
+                                        double p1 = 1 - p2;
+                                        byte val = (byte)((iter * 255 * p1 + (iter + 1) * 255 * p2) / options.Iterations);
                                         red = grn = blu = val;
                                         break;
                                     }
@@ -197,10 +196,11 @@ namespace LocalRenderers
                                     }
                                 case ColoringAlgorithm.SmoothIterPalette:
                                     {
-                                        double p1 = Math.Log(Math.Log(rr + ii)) / ln2; // Smooth iteration algorithm from wikipedia, simplified by WolframAlpha
-                                        double p2 = 1 - p1;
-                                        int min = iter;
-                                        int max = iter + 1;
+                                        double smooth = iter + 1 + Math.Log(lnbail / Math.Log(Math.Sqrt(rr + ii))) / ln2;
+                                        double p2 = smooth % 1;
+                                        double p1 = 1 - p2;
+                                        int min = (int)smooth % options.Palette.Length + options.Palette.Length;
+                                        int max = (min + 1) % options.Palette.Length + options.Palette.Length;
                                         Color c1 = options.Palette[min % options.Palette.Length]; // Linear interpolation
                                         Color c2 = options.Palette[max % options.Palette.Length];
                                         red = (byte)(c1.R * p1 + c2.R * p2);
@@ -246,7 +246,6 @@ namespace LocalRenderers
             if (options.TaskComplete != null)
                 options.TaskComplete(tasknum, retcode, options.User, res);
         }
-
 
         private TaskOptions CreatePreviewOptions(Size size)
         {
