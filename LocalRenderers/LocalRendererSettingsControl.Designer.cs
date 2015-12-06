@@ -41,6 +41,7 @@
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.textBox4 = new System.Windows.Forms.TextBox();
             this.flpPalette = new System.Windows.Forms.FlowLayoutPanel();
+            this.cbThreads = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.nmrIter)).BeginInit();
             this.SuspendLayout();
             // 
@@ -143,6 +144,7 @@
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(100, 20);
             this.textBox2.TabIndex = 9;
+            this.textBox2.TextChanged += new System.EventHandler(this.tb_TextChanged);
             // 
             // textBox3
             // 
@@ -152,6 +154,7 @@
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(100, 20);
             this.textBox3.TabIndex = 11;
+            this.textBox3.TextChanged += new System.EventHandler(this.tb_TextChanged);
             // 
             // textBox4
             // 
@@ -161,22 +164,36 @@
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(100, 20);
             this.textBox4.TabIndex = 10;
+            this.textBox4.TextChanged += new System.EventHandler(this.tb_TextChanged);
             // 
             // flpPalette
             // 
             this.flpPalette.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.flpPalette.Location = new System.Drawing.Point(3, 187);
+            this.flpPalette.Location = new System.Drawing.Point(3, 210);
             this.flpPalette.Name = "flpPalette";
-            this.flpPalette.Size = new System.Drawing.Size(171, 205);
+            this.flpPalette.Size = new System.Drawing.Size(171, 182);
             this.flpPalette.TabIndex = 12;
             this.flpPalette.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.flpPalette_MouseDoubleClick);
+            // 
+            // cbThreads
+            // 
+            this.cbThreads.AutoSize = true;
+            this.cbThreads.Checked = true;
+            this.cbThreads.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbThreads.Location = new System.Drawing.Point(74, 187);
+            this.cbThreads.Name = "cbThreads";
+            this.cbThreads.Size = new System.Drawing.Size(100, 17);
+            this.cbThreads.TabIndex = 0;
+            this.cbThreads.Text = "Multiple threads";
+            this.cbThreads.UseVisualStyleBackColor = true;
             // 
             // LocalRendererSettingsControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.cbThreads);
             this.Controls.Add(this.flpPalette);
             this.Controls.Add(this.textBox3);
             this.Controls.Add(this.textBox4);
@@ -213,5 +230,6 @@
         private System.Windows.Forms.TextBox textBox3;
         private System.Windows.Forms.TextBox textBox4;
         private System.Windows.Forms.FlowLayoutPanel flpPalette;
+        private System.Windows.Forms.CheckBox cbThreads;
     }
 }

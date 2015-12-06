@@ -15,6 +15,7 @@ namespace LocalRenderers
         public AbstractRenderer.RenderComplete TaskComplete { get; set; }
         public AbstractRenderer.RenderProgress TaskProgress { get; set; }
         public object User { get; set; }
+        public bool MultiThreaded { get; set; }
 
         public Color[] Palette { get; set; }
 
@@ -43,6 +44,7 @@ namespace LocalRenderers
             opt.TaskAborted = TaskAborted;
             opt.TaskComplete = TaskComplete;
             opt.TaskProgress = TaskProgress;
+            opt.MultiThreaded = MultiThreaded;
             opt.User = User;
 
             if (Palette != null)

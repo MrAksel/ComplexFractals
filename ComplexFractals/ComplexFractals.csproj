@@ -48,6 +48,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ShortcutDereferencer.cs" />
     <EmbeddedResource Include="Fractals.resx">
       <DependentUpon>Fractals.cs</DependentUpon>
     </EmbeddedResource>

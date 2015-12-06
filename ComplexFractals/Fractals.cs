@@ -65,7 +65,12 @@ namespace ComplexFractals
 
                 try
                 {
-                    Assembly a = Assembly.LoadFile(fi.FullName);
+                    string path = fi.FullName;
+                    if (path.EndsWith(".lnk")) // Shortcut!
+                    {
+                        path = ShortcutDereferencer.ResolveShortcut(path);
+                    }
+                    Assembly a = Assembly.LoadFile(path);
 
                     progressBar1.Value = loaded * 1000 + 250;
                     Application.DoEvents();
@@ -224,6 +229,7 @@ namespace ComplexFractals
                 fractalRenderer.AbortRender(currentTask);
             }
 
+            progressBar1.Maximum = 1000;
             currentTask = fractalRenderer.StartRenderAsync(pbFractal.Size, renderComplete, renderProgress, renderAborted);
             if (currentTask != 0)
             {
@@ -241,8 +247,8 @@ namespace ComplexFractals
             {
                 Invoke(new Action(() =>
                 {
-                    progressBar1.Maximum = 1000;
-                    progressBar1.Value = (int)(percentage * 1000);
+                    int val = (int)(percentage * 1000);
+                    progressBar1.Value = (val < 0 ? 0 : val > 1000 ? 1000 : val); // Clamp to between 0 and 1000
                     SetStatus("Rendering... {0:P1}", percentage);
                 }));
             }

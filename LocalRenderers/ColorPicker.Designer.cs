@@ -35,7 +35,7 @@
             // 
             this.btnClear.BackColor = System.Drawing.Color.Transparent;
             this.btnClear.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnClear.Location = new System.Drawing.Point(125, 0);
+            this.btnClear.Location = new System.Drawing.Point(126, 0);
             this.btnClear.Name = "btnClear";
             this.btnClear.Size = new System.Drawing.Size(24, 24);
             this.btnClear.TabIndex = 0;

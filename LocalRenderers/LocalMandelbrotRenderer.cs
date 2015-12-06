@@ -4,6 +4,8 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace LocalRenderers
 {
@@ -91,9 +93,9 @@ namespace LocalRenderers
             int tasknum = GetTaskNumber();
             activeTasks.Add(tasknum);
 
+            TaskOptions taskopt = options.Clone();
             WaitCallback task = new WaitCallback(delegate
             {
-                TaskOptions taskopt = options.Clone();
                 RenderTaskAsync(taskopt, tasknum);
             });
             ThreadPool.QueueUserWorkItem(task);
@@ -118,94 +120,120 @@ namespace LocalRenderers
             double rinc = (options.RealMax - options.RealMin) / bd.Width;
             double iinc = (options.ImagMax - options.ImagMin) / bd.Height;
 
-            // TODO Supersampling, bulb checking, fixing smooth iter count
-            for (int y = 0; y < bd.Height; y++)
+            // TODO Supersampling, bulb checking, fixing smooth iter count, threading
+            int rowsDone = 0;
+            Action<Tuple<int, int, int, int>> worker = new Action<Tuple<int, int, int, int>>((offset) =>
             {
-                if (options.TaskProgress != null)
-                    options.TaskProgress(tasknum, options.User, y / (float)bd.Height);
+                int xoff = offset.Item1;
+                int xjmp = offset.Item2;
+                int yoff = offset.Item3;
+                int yjmp = offset.Item4;
 
-                double mappedi = (double)y / bd.Height * (options.ImagMax - options.ImagMin) + options.ImagMin;
-                double ci = mappedi;
+                int bailout = 2;
+                int bailsqr = bailout * bailout;
+                double lnbail = Math.Log(bailout);
 
-                byte* row = start + bd.Stride * y;
-                byte* px = row;
-                for (int x = 0; x < bd.Width; x++)
+                for (int y = yoff; y < bd.Height; y += yjmp)
                 {
-                    double mappedr = (double)x / bd.Width * (options.RealMax - options.RealMin) + options.RealMin;
+                    double mappedi = (double)y / bd.Height * (options.ImagMax - options.ImagMin) + options.ImagMin;
+                    double ci = mappedi;
 
-                    double cr = mappedr;
-                    double tpr = 0; // Temporary r to store result in loop
-                    double r = cr;
-                    double i = ci;
-                    double rr = r * r;
-                    double ii = i * i;
-
-                    int iter = 0;
-                    while (iter < options.Iterations && (rr + ii) < 4)
+                    byte* row = start + bd.Stride * y;
+                    byte* px = row + pxsize * xoff;
+                    for (int x = xoff; x < bd.Width; x += xjmp)
                     {
-                        tpr = rr - ii + cr;
-                        i = 2 * r * i + ci;
-                        r = tpr;
+                        double mappedr = (double)x / bd.Width * (options.RealMax - options.RealMin) + options.RealMin;
 
-                        rr = r * r;
-                        ii = i * i;
-                        iter++;
-                    }
-                    byte red, grn, blu;
-                    if (iter < options.Iterations)
-                    {
-                        switch (options.Coloring) // Branch prediction will guess correctly after a few tries, right?   
+                        double cr = mappedr;
+                        double r = cr;
+                        double i = ci;
+                        double rr = r * r;
+                        double ii = i * i;
+
+                        int iter = 0;
+                        while (iter < options.Iterations && (rr + ii) < bailsqr)
                         {
-                            default:
-                            case ColoringAlgorithm.FastIterGray:
-                                {
-                                    byte val = (byte)(iter * 255 / options.Iterations);
-                                    red = grn = blu = val;
-                                    break;
-                                }
-                            case ColoringAlgorithm.SmoothIterGray:
-                                {
-                                    double p1 = Math.Log(Math.Log(rr + ii)) / ln2; // Smooth iteration algorithm from wikipedia, simplified by WolframAlpha
-                                    double p2 = 1 - p1;
-                                    int min = iter;
-                                    int max = iter + 1;
-                                    byte val = (byte)(iter * 255 * p1 + max * 255 * p2);
-                                    red = grn = blu = val;
-                                    break;
-                                }
-                            case ColoringAlgorithm.FastIterPalette:
-                                {
-                                    int col = iter % options.Palette.Length;
-                                    Color color = options.Palette[col];
-                                    red = color.R;
-                                    grn = color.G;
-                                    blu = color.B;
-                                    break;
-                                }
-                            case ColoringAlgorithm.SmoothIterPalette:
-                                {
-                                    double p1 = Math.Log(Math.Log(rr + ii)) / ln2; // Smooth iteration algorithm from wikipedia, simplified by WolframAlpha
-                                    double p2 = 1 - p1;
-                                    int min = iter;
-                                    int max = iter + 1;
-                                    Color c1 = options.Palette[min % options.Palette.Length]; // Linear interpolation
-                                    Color c2 = options.Palette[max % options.Palette.Length];
-                                    red = (byte)(c1.R * p1 + c2.R * p2);
-                                    grn = (byte)(c1.G * p1 + c2.G * p2);
-                                    blu = (byte)(c1.B * p1 + c2.B * p2);
-                                    break;
-                                }
+                            i = r * i;
+                            i = i + i + ci; // 2 * r * i + ci
+                            r = rr - ii + cr;
+                            //tmp = rr - ii + cr;
+                            //i = 2 * r * i + ci;
+                            //r = tpr;
+
+                            rr = r * r;
+                            ii = i * i;
+                            iter++;
                         }
+                        byte red, grn, blu;
+                        if (iter < options.Iterations)
+                        {
+                            switch (options.Coloring) // Branch prediction will guess correctly after a few tries, right?   
+                            {
+                                default:
+                                case ColoringAlgorithm.FastIterGray:
+                                    {
+                                        byte val = (byte)(iter * 255 / options.Iterations);
+                                        red = grn = blu = val;
+                                        break;
+                                    }
+                                case ColoringAlgorithm.SmoothIterGray:
+                                    {
+                                        double p1 = Math.Log(Math.Log(rr + ii)) / ln2; // Smooth iteration algorithm from wikipedia, simplified by WolframAlpha
+                                        double p2 = 1 - p1;
+                                        int min = iter;
+                                        int max = iter + 1;
+                                        byte val = (byte)(iter * 255 * p1 + max * 255 * p2);
+                                        red = grn = blu = val;
+                                        break;
+                                    }
+                                case ColoringAlgorithm.FastIterPalette:
+                                    {
+                                        int col = iter % options.Palette.Length;
+                                        Color color = options.Palette[col];
+                                        red = color.R;
+                                        grn = color.G;
+                                        blu = color.B;
+                                        break;
+                                    }
+                                case ColoringAlgorithm.SmoothIterPalette:
+                                    {
+                                        double p1 = Math.Log(Math.Log(rr + ii)) / ln2; // Smooth iteration algorithm from wikipedia, simplified by WolframAlpha
+                                        double p2 = 1 - p1;
+                                        int min = iter;
+                                        int max = iter + 1;
+                                        Color c1 = options.Palette[min % options.Palette.Length]; // Linear interpolation
+                                        Color c2 = options.Palette[max % options.Palette.Length];
+                                        red = (byte)(c1.R * p1 + c2.R * p2);
+                                        grn = (byte)(c1.G * p1 + c2.G * p2);
+                                        blu = (byte)(c1.B * p1 + c2.B * p2);
+                                        break;
+                                    }
+                            }
+                        }
+                        else
+                        {
+                            red = grn = blu = 0;
+                        }
+                        px[0] = blu;
+                        px[1] = grn;
+                        px[2] = red;
+                        px += pxsize * xjmp;
                     }
-                    else
-                    {
-                        red = grn = blu = 0;
-                    }
-                    px[0] = blu;
-                    px[1] = grn;
-                    px[2] = red;
-                    px += pxsize;
+
+                    int rows = Interlocked.Increment(ref rowsDone);
+                    if (options.TaskProgress != null)
+                        options.TaskProgress(tasknum, options.User, rows / (float)bd.Height);
                 }
+            });
+
+            if (options.MultiThreaded)
+            {
+                IEnumerable<Tuple<int, int, int, int>> offsets = CreateOffsets();
+                Parallel.ForEach(offsets, worker); // Does actual work
+            }
+            else
+            {
+                worker(new Tuple<int, int, int, int>(0, 1, 0, 1)); // Work on a single thread
             }
 
             res.UnlockBits(bd);
@@ -231,6 +259,7 @@ namespace LocalRenderers
 
             opt.SuperSampling = SuperSampling.OneByOne;
             opt.Iterations = (int)Math.Pow(settingsControl.Iterations, 2.0 / 3.0);
+            opt.MultiThreaded = false;
 
             return opt;
         }
@@ -238,15 +267,53 @@ namespace LocalRenderers
         private TaskOptions CreateRenderOptions(Size size)
         {
             TaskOptions opt = new TaskOptions();
+            opt.Size = size;
+            opt.Min = settingsControl.Min;
+            opt.Max = settingsControl.Max;
+            opt.Palette = settingsControl.Palette;
             opt.Coloring = settingsControl.Coloring;
             opt.Iterations = settingsControl.Iterations;
             opt.SuperSampling = settingsControl.Sampling;
-            opt.Palette = settingsControl.Palette;
-            opt.Min = settingsControl.Min;
-            opt.Max = settingsControl.Max;
-            opt.Size = size;
+            opt.MultiThreaded = settingsControl.Multithreaded;
             return opt;
         }
 
+        private List<Tuple<int, int, int, int>> CreateOffsets()
+        {
+            int logicalCores = Environment.ProcessorCount;
+            int x, y;
+            SolveRectangle(logicalCores * 2, out x, out y);
+
+            List<Tuple<int, int, int, int>> tuples = new List<Tuple<int, int, int, int>>();
+            for (int a = 0; a < x; a++)
+            {
+                for (int b = 0; b < y; b++)
+                {
+                    Tuple<int, int, int, int> t = new Tuple<int, int, int, int>
+                        (a, x, b, y);
+                    tuples.Add(t);
+                }
+            }
+
+            string msg = string.Join("\n", tuples.Select(t => string.Format("{0}+{1} {2}+{3}", t.Item1, t.Item2, t.Item3, t.Item4)).ToArray());
+            System.Diagnostics.Debug.WriteLine(msg);
+            return tuples;
+        }
+
+        private void SolveRectangle(int area, out int s_a, out int s_b)
+        {
+            int maxDiv = (int)Math.Sqrt(area) + 1;
+            s_a = 1;
+            s_b = area;
+            for (int a = 1; a < maxDiv; a++)
+            {
+                int b = area / a;
+                if (a * b == area && Math.Abs(a - b) < Math.Abs(s_a - s_b))
+                {
+                    s_a = a;
+                    s_b = b;
+                }
+            }
+        }
     }
 }

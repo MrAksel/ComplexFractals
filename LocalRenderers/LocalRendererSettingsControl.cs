@@ -108,6 +108,14 @@ namespace LocalRenderers
             }
         }
 
+        public bool Multithreaded
+        {
+            get
+            {
+                return cbThreads.Checked;
+            }
+        }
+
         private void LoadPalette()
         {
             Color[] colors = new Color[] { Color.Blue, Color.BlueViolet, Color.Indigo, Color.MediumVioletRed, Color.Red, Color.Orange, Color.Gold, Color.Yellow, Color.Green, Color.DarkSeaGreen };
