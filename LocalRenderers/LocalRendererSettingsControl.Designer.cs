@@ -44,7 +44,10 @@
             this.flpPalette = new System.Windows.Forms.FlowLayoutPanel();
             this.cbThreads = new System.Windows.Forms.CheckBox();
             this.cbBulbs = new System.Windows.Forms.CheckBox();
+            this.nmrUpdates = new System.Windows.Forms.NumericUpDown();
+            this.label6 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.nmrIter)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nmrUpdates)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -74,7 +77,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(3, 32);
+            this.label2.Location = new System.Drawing.Point(3, 58);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(48, 13);
             this.label2.TabIndex = 2;
@@ -83,7 +86,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(3, 59);
+            this.label3.Location = new System.Drawing.Point(3, 85);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(79, 13);
             this.label3.TabIndex = 3;
@@ -94,7 +97,7 @@
             this.cbColoring.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbColoring.FormattingEnabled = true;
-            this.cbColoring.Location = new System.Drawing.Point(62, 29);
+            this.cbColoring.Location = new System.Drawing.Point(62, 55);
             this.cbColoring.Name = "cbColoring";
             this.cbColoring.Size = new System.Drawing.Size(112, 21);
             this.cbColoring.TabIndex = 4;
@@ -105,7 +108,7 @@
             this.cbSampling.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbSampling.FormattingEnabled = true;
-            this.cbSampling.Location = new System.Drawing.Point(82, 56);
+            this.cbSampling.Location = new System.Drawing.Point(82, 82);
             this.cbSampling.Name = "cbSampling";
             this.cbSampling.Size = new System.Drawing.Size(92, 21);
             this.cbSampling.TabIndex = 5;
@@ -113,7 +116,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(3, 86);
+            this.label4.Location = new System.Drawing.Point(3, 112);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(60, 13);
             this.label4.TabIndex = 6;
@@ -122,7 +125,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(3, 138);
+            this.label5.Location = new System.Drawing.Point(3, 164);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(52, 13);
             this.label5.TabIndex = 7;
@@ -132,7 +135,7 @@
             // 
             this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Location = new System.Drawing.Point(74, 83);
+            this.textBox1.Location = new System.Drawing.Point(74, 109);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(100, 20);
             this.textBox1.TabIndex = 8;
@@ -142,7 +145,7 @@
             // 
             this.textBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox2.Location = new System.Drawing.Point(74, 109);
+            this.textBox2.Location = new System.Drawing.Point(74, 135);
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(100, 20);
             this.textBox2.TabIndex = 9;
@@ -152,7 +155,7 @@
             // 
             this.textBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox3.Location = new System.Drawing.Point(74, 135);
+            this.textBox3.Location = new System.Drawing.Point(74, 161);
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(100, 20);
             this.textBox3.TabIndex = 11;
@@ -162,7 +165,7 @@
             // 
             this.textBox4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox4.Location = new System.Drawing.Point(74, 161);
+            this.textBox4.Location = new System.Drawing.Point(74, 187);
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(100, 20);
             this.textBox4.TabIndex = 10;
@@ -175,9 +178,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.flpPalette.AutoScroll = true;
             this.flpPalette.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.flpPalette.Location = new System.Drawing.Point(3, 233);
+            this.flpPalette.Location = new System.Drawing.Point(3, 259);
             this.flpPalette.Name = "flpPalette";
-            this.flpPalette.Size = new System.Drawing.Size(171, 159);
+            this.flpPalette.Size = new System.Drawing.Size(171, 167);
             this.flpPalette.TabIndex = 12;
             this.flpPalette.SizeChanged += new System.EventHandler(this.flpPalette_SizeChanged);
             this.flpPalette.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.flpPalette_MouseDoubleClick);
@@ -187,29 +190,54 @@
             this.cbThreads.AutoSize = true;
             this.cbThreads.Checked = true;
             this.cbThreads.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbThreads.Location = new System.Drawing.Point(6, 187);
+            this.cbThreads.Location = new System.Drawing.Point(6, 213);
             this.cbThreads.Name = "cbThreads";
             this.cbThreads.Size = new System.Drawing.Size(100, 17);
             this.cbThreads.TabIndex = 0;
             this.cbThreads.Text = "Multiple threads";
             this.cbThreads.UseVisualStyleBackColor = true;
             // 
-            // checkBox1
+            // cbBulbs
             // 
             this.cbBulbs.AutoSize = true;
             this.cbBulbs.Checked = true;
             this.cbBulbs.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbBulbs.Location = new System.Drawing.Point(6, 210);
-            this.cbBulbs.Name = "checkBox1";
+            this.cbBulbs.Location = new System.Drawing.Point(6, 236);
+            this.cbBulbs.Name = "cbBulbs";
             this.cbBulbs.Size = new System.Drawing.Size(121, 17);
             this.cbBulbs.TabIndex = 13;
             this.cbBulbs.Text = "Check primary bulbs";
             this.cbBulbs.UseVisualStyleBackColor = true;
             // 
+            // nmrUpdates
+            // 
+            this.nmrUpdates.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.nmrUpdates.Location = new System.Drawing.Point(104, 29);
+            this.nmrUpdates.Name = "nmrUpdates";
+            this.nmrUpdates.Size = new System.Drawing.Size(70, 20);
+            this.nmrUpdates.TabIndex = 15;
+            this.nmrUpdates.Value = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(3, 31);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(95, 13);
+            this.label6.TabIndex = 14;
+            this.label6.Text = "Update frequency:";
+            // 
             // LocalRendererSettingsControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.nmrUpdates);
+            this.Controls.Add(this.label6);
             this.Controls.Add(this.cbBulbs);
             this.Controls.Add(this.cbThreads);
             this.Controls.Add(this.flpPalette);
@@ -226,8 +254,9 @@
             this.Controls.Add(this.nmrIter);
             this.Controls.Add(this.label1);
             this.Name = "LocalRendererSettingsControl";
-            this.Size = new System.Drawing.Size(180, 395);
+            this.Size = new System.Drawing.Size(180, 429);
             ((System.ComponentModel.ISupportInitialize)(this.nmrIter)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nmrUpdates)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -250,5 +279,7 @@
         private System.Windows.Forms.FlowLayoutPanel flpPalette;
         private System.Windows.Forms.CheckBox cbThreads;
         private System.Windows.Forms.CheckBox cbBulbs;
+        private System.Windows.Forms.NumericUpDown nmrUpdates;
+        private System.Windows.Forms.Label label6;
     }
 }

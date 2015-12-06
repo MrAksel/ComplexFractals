@@ -7,6 +7,7 @@ namespace LocalRenderers
 {
     public class TaskOptions
     {
+        public int Updates { get; set; }
         public int Iterations { get; set; }
         public Size Size { get; set; }
         public ColoringAlgorithm Coloring { get; set; }
@@ -39,6 +40,7 @@ namespace LocalRenderers
         {
             TaskOptions opt = new TaskOptions();
             opt.Iterations = Iterations;
+            opt.Updates = Updates;
             opt.Size = Size;
             opt.Coloring = Coloring;
             opt.SuperSampling = SuperSampling;

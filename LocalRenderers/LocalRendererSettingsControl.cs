@@ -19,6 +19,7 @@ namespace LocalRenderers
             InitializeComponent();
 
             nmrIter.Maximum = int.MaxValue;
+            nmrUpdates.Maximum = int.MaxValue;
 
             cbColoring.Items.AddRange(Enum.GetNames(typeof(ColoringAlgorithm)));
 
@@ -42,7 +43,7 @@ namespace LocalRenderers
             textBox2.Text = (-1.2).ToString();
             textBox3.Text = (+1.5).ToString();
             textBox4.Text = (+1.2).ToString();
-            
+
             /*
             textBox1.Text = (-5).ToString();
             textBox2.Text = (-5).ToString();
@@ -59,6 +60,14 @@ namespace LocalRenderers
             get
             {
                 return (int)nmrIter.Value;
+            }
+        }
+
+        public int Updates
+        {
+            get
+            {
+                return (int)nmrUpdates.Value;
             }
         }
 
@@ -224,7 +233,7 @@ namespace LocalRenderers
             OnSettingsChanged(true);
         }
 
-        
+
         private void flpPalette_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             AddControl(Color.White);

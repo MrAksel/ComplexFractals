@@ -121,7 +121,11 @@ namespace LocalRenderers
             double iinc = (options.ImagMax - options.ImagMin) / bd.Height;
 
             // TODO Supersampling, bulb checking
-            int rowsDone = 0;
+            bool progress = options.TaskProgress != null && options.Updates > 0;
+            int pxDone = 0;
+            float pxTot = bd.Width * bd.Height;
+            int updateinc = (progress ? (int)(pxTot / options.Updates) : int.MaxValue);
+            int nextupdate = updateinc;
             Action<Tuple<int, int, int, int>> worker = new Action<Tuple<int, int, int, int>>((offset) =>
             {
                 int xoff = offset.Item1;
@@ -163,7 +167,7 @@ namespace LocalRenderers
                         int iter = 0;
                         if (!inset)
                         {
-                            while (iter < options.Iterations && (distsqr) < bailsqr)
+                            while (iter < options.Iterations && distsqr < bailsqr)
                             {
                                 i = r * i;
                                 i = i + i + ci;
@@ -189,7 +193,7 @@ namespace LocalRenderers
                                     }
                                 case ColoringAlgorithm.SmoothIterGray:
                                     {
-                                        double smooth = iter + 1 + ln2lnbailoverln2 - Math.Log(Math.Log(rr + ii)) / ln2;
+                                        double smooth = iter + 1 + ln2lnbailoverln2 - Math.Log(Math.Log(distsqr)) / ln2;
                                         double p2 = smooth % 1;
                                         double p1 = 1 - p2;
                                         byte val = (byte)((iter * 255 * p1 + (iter + 1) * 255 * p2) / options.Iterations);
@@ -207,11 +211,11 @@ namespace LocalRenderers
                                     }
                                 case ColoringAlgorithm.SmoothIterPalette:
                                     {
-                                        double smooth = iter + 1 + ln2lnbailoverln2 - Math.Log(Math.Log(rr + ii)) / ln2;
+                                        double smooth = iter + 1 + ln2lnbailoverln2 - Math.Log(Math.Log(distsqr)) / ln2;
                                         double p2 = smooth % 1;
                                         double p1 = 1 - p2;
-                                        int min = (int)smooth % options.Palette.Length + options.Palette.Length;
-                                        int max = (min + 1) % options.Palette.Length + options.Palette.Length;
+                                        int min = (int)smooth % options.Palette.Length + options.Palette.Length; // Make sure it's positive
+                                        int max = min + 1;
                                         Color c1 = options.Palette[min % options.Palette.Length]; // Linear interpolation
                                         Color c2 = options.Palette[max % options.Palette.Length];
                                         red = (byte)(c1.R * p1 + c2.R * p2);
@@ -231,9 +235,16 @@ namespace LocalRenderers
                         px += pxsize * xjmp;
                     }
 
-                    int rows = Interlocked.Increment(ref rowsDone);
-                    if (rows % 32 == 0 && options.TaskProgress != null)
-                        options.TaskProgress(tasknum, options.User, rows / (float)bd.Height);
+                    if (progress)
+                    {
+                        int numpx = Interlocked.Add(ref pxDone, bd.Width / xjmp);
+                        int updat = nextupdate;
+                        if (numpx > updat)
+                        {
+                            options.TaskProgress(tasknum, options.User, numpx / pxTot);
+                            Interlocked.CompareExchange(ref nextupdate, numpx + updateinc, updat); // If its not the same another thread has already updated it
+                        }
+                    }
                 }
             });
 
@@ -280,6 +291,7 @@ namespace LocalRenderers
             opt.Size = size;
             opt.Min = settingsControl.Min;
             opt.Max = settingsControl.Max;
+            opt.Updates = settingsControl.Updates;
             opt.Palette = settingsControl.Palette;
             opt.Coloring = settingsControl.Coloring;
             opt.Iterations = settingsControl.Iterations;
