@@ -97,7 +97,7 @@ namespace ComplexFractals
                         if (!t.IsAbstract && t.IsSubclassOf(typeof(AbstractRenderer)))
                         {
                             FractalRendererAttribute info = t.GetCustomAttribute<FractalRendererAttribute>(true);
-                            if (info != null)
+                            if (info != null && info.Enabled)
                             {
                                 string fractal = info.FractalName;
                                 string renderer = prefix + info.RendererName;
