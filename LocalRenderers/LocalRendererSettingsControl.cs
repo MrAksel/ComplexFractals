@@ -14,7 +14,7 @@ namespace LocalRenderers
     {
         private Dictionary<TextBox, string> texts;
 
-        public LocalRendererSettingsControl()
+        public LocalRendererSettingsControl(Fractal fractal)
         {
             InitializeComponent();
 

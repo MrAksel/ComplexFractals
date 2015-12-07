@@ -48,7 +48,8 @@
     <Compile Include="ColorPicker.Designer.cs">
       <DependentUpon>ColorPicker.cs</DependentUpon>
     </Compile>
-    <Compile Include="LocalMandelbrotRenderer.cs" />
+    <Compile Include="Fractal.cs" />
+    <Compile Include="Mandelbrot\LocalMandelbrotRenderer.cs" />
     <Compile Include="LocalRendererSettingsControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -56,7 +57,7 @@
       <DependentUpon>LocalRendererSettingsControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TaskOptions.cs" />
+    <Compile Include="Mandelbrot\MandelbrotTaskOptions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FractalRenderer\FractalRenderer.csproj">

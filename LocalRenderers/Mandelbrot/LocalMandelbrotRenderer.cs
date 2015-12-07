@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Numerics;
 using System.Collections.Concurrent;
 
-namespace LocalRenderers
+namespace LocalRenderers.Mandelbrot
 {
     [FractalRenderer("Mandelbrot", "Local renderer")]
     public class LocalMandelbrotRenderer : AbstractRenderer
@@ -21,7 +21,7 @@ namespace LocalRenderers
         public LocalMandelbrotRenderer()
         {
             activeTasks = new ConcurrentDictionary<int, CancellationTokenSource>();
-            settingsControl = new LocalRendererSettingsControl();
+            settingsControl = new LocalRendererSettingsControl(Fractal.Mandelbrot);
         }
 
 
@@ -40,17 +40,17 @@ namespace LocalRenderers
 
         public override Bitmap DrawPreview(Size size)
         {
-            TaskOptions opt = CreatePreviewOptions(size);
+            MandelbrotTaskOptions opt = CreatePreviewOptions(size);
             return DrawFractal(opt);
         }
 
         public override Bitmap DrawFractal(Size size)
         {
-            TaskOptions opt = CreateRenderOptions(size);
+            MandelbrotTaskOptions opt = CreateRenderOptions(size);
             return DrawFractal(opt);
         }
 
-        public Bitmap DrawFractal(TaskOptions opt)
+        public Bitmap DrawFractal(MandelbrotTaskOptions opt)
         {
             bool success = false;
             Bitmap bmref = null;
@@ -87,7 +87,7 @@ namespace LocalRenderers
             if (size.Width < 1 || size.Height < 1 || completeCallback == null) // No point in starting if the area is zero or noone gets notified when its completed
                 return 0; // Zero means not started
 
-            TaskOptions options = CreateRenderOptions(size);
+            MandelbrotTaskOptions options = CreateRenderOptions(size);
             options.TaskComplete = completeCallback;
             options.TaskProgress = progressCallback;
             options.TaskAborted = abortedCallback;
@@ -97,7 +97,7 @@ namespace LocalRenderers
             return StartRenderAsync(options);
         }
 
-        public int StartRenderAsync(TaskOptions options)
+        public int StartRenderAsync(MandelbrotTaskOptions options)
         {
             if (options.Area == 0)
                 return 0;
@@ -108,7 +108,7 @@ namespace LocalRenderers
             while (!activeTasks.TryAdd(tasknum, source))
                 tasknum = GetTaskNumber();
 
-            TaskOptions taskopt = options.Clone();
+            MandelbrotTaskOptions taskopt = options.Clone();
             WaitCallback task = new WaitCallback(delegate
             {
                 RenderTaskAsync(taskopt, tasknum, source.Token);
@@ -119,7 +119,7 @@ namespace LocalRenderers
         }
 
 
-        private unsafe void RenderTaskAsync(TaskOptions options, int tasknum, CancellationToken cancelToken)
+        private unsafe void RenderTaskAsync(MandelbrotTaskOptions options, int tasknum, CancellationToken cancelToken)
         {
             bool canceled = false;
             Bitmap res = new Bitmap(options.ActualRenderSize.Width, options.ActualRenderSize.Height, PixelFormat.Format24bppRgb);
@@ -301,9 +301,9 @@ namespace LocalRenderers
         }
 
 
-        private TaskOptions CreatePreviewOptions(Size size)
+        private MandelbrotTaskOptions CreatePreviewOptions(Size size)
         {
-            TaskOptions opt = CreateRenderOptions(size); // Creates options based on the settings control
+            MandelbrotTaskOptions opt = CreateRenderOptions(size); // Creates options based on the settings control
 
             if (opt.Coloring == ColoringAlgorithm.SmoothIterPalette)
                 opt.Coloring = ColoringAlgorithm.FastIterPalette;
@@ -317,9 +317,9 @@ namespace LocalRenderers
             return opt;
         }
 
-        private TaskOptions CreateRenderOptions(Size size)
+        private MandelbrotTaskOptions CreateRenderOptions(Size size)
         {
-            TaskOptions opt = new TaskOptions();
+            MandelbrotTaskOptions opt = new MandelbrotTaskOptions();
             opt.Size = size;
             opt.Min = settingsControl.Min;
             opt.Max = settingsControl.Max;
@@ -373,22 +373,6 @@ namespace LocalRenderers
         public override bool SupportsZooming()
         {
             return true;
-        }
-
-        public override Complex PointToComplex(Point onPlane, Size planeSize)
-        {
-            double cx = onPlane.X / (double)planeSize.Width * (settingsControl.Max.Real - settingsControl.Min.Real) + settingsControl.Min.Real;
-            double cy = onPlane.Y / (double)planeSize.Height * (settingsControl.Max.Imaginary - settingsControl.Min.Imaginary) + settingsControl.Min.Imaginary;
-
-            return new Complex(cx, cy);
-        }
-
-        public override Complex PointToRealPlane(Complex onPlane, Size planeSize)
-        {
-            double x = (onPlane.Real - settingsControl.Min.Real) / (settingsControl.Max.Real - settingsControl.Min.Real) * planeSize.Width;
-            double y = (onPlane.Imaginary - settingsControl.Min.Imaginary) / (settingsControl.Max.Imaginary - settingsControl.Min.Imaginary) * planeSize.Height;
-
-            return new Complex(x, y);
         }
 
         public override void SetClip(Complex min, Complex max)

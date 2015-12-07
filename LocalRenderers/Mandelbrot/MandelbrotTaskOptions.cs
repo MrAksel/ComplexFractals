@@ -3,21 +3,21 @@ using FractalRenderer;
 using System.Numerics;
 using System;
 
-namespace LocalRenderers
+namespace LocalRenderers.Mandelbrot
 {
-    public class TaskOptions
+    public class MandelbrotTaskOptions
     {
-        public int Updates { get; set; }
-        public int Iterations { get; set; }
         public Size Size { get; set; }
-        public ColoringAlgorithm Coloring { get; set; }
+        public int Updates { get; set; }
+        public object User { get; set; }
+        public int Iterations { get; set; }
+        public bool BulbChecking { get; set; }
+        public bool MultiThreaded { get; set; }
         public Size AntiAliasingScale { get; set; }
+        public ColoringAlgorithm Coloring { get; set; }
         public AbstractRenderer.RenderAborted TaskAborted { get; set; }
         public AbstractRenderer.RenderComplete TaskComplete { get; set; }
         public AbstractRenderer.RenderProgress TaskProgress { get; set; }
-        public object User { get; set; }
-        public bool MultiThreaded { get; set; }
-        public bool BulbChecking { get; set; }
 
         public Color[] Palette { get; set; }
 
@@ -45,9 +45,9 @@ namespace LocalRenderers
             }
         }
 
-        public TaskOptions Clone()
+        public MandelbrotTaskOptions Clone()
         {
-            TaskOptions opt = new TaskOptions();
+            MandelbrotTaskOptions opt = new MandelbrotTaskOptions();
             opt.Iterations = Iterations;
             opt.Updates = Updates;
             opt.Size = Size;
