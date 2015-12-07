@@ -136,6 +136,11 @@ namespace LocalRenderers
             }
         }
 
+        public string Function { get; internal set; }
+        public string Derivative { get; internal set; }
+
+        public double Tolerance { get; internal set; }
+        public Complex Multiplier { get; internal set; }
 
         private void LoadPalette()
         {

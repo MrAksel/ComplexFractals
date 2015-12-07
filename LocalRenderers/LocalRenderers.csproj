@@ -56,6 +56,8 @@
     <Compile Include="LocalRendererSettingsControl.Designer.cs">
       <DependentUpon>LocalRendererSettingsControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Newton\LocalNewtonRenderer.cs" />
+    <Compile Include="Newton\NewtonTaskOptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Mandelbrot\MandelbrotTaskOptions.cs" />
   </ItemGroup>
