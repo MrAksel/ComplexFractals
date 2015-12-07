@@ -11,10 +11,27 @@ namespace FractalRenderer
         public abstract SettingsWindow GetSettingsWindow();
 
         public abstract bool SupportsZooming();
-        public abstract Complex PointToComplex(Point onRealPlane, Size planeSize);
-        public abstract Complex PointToRealPlane(Complex onImagPlane, Size planeSize);
         public abstract void SetClip(Complex min, Complex max);
         public abstract void GetClip(out Complex min, out Complex max);
+
+        public virtual Complex PointToComplex(Point onPlane, Size planeSize)
+        {
+            Complex min, max;
+            GetClip(out min, out max);
+            double cx = onPlane.X / (double)planeSize.Width * (max.Real - min.Real) + min.Real;
+            double cy = onPlane.Y / (double)planeSize.Height * (max.Imaginary - min.Imaginary) + min.Imaginary;
+
+            return new Complex(cx, cy);
+        }
+        public virtual Complex PointToRealPlane(Complex onPlane, Size planeSize)
+        {
+            Complex min, max;
+            GetClip(out min, out max);
+            double x = (onPlane.Real - min.Real) / (max.Real - min.Real) * planeSize.Width;
+            double y = (onPlane.Imaginary - min.Imaginary) / (max.Imaginary - min.Imaginary) * planeSize.Height;
+
+            return new Complex(x, y);
+        }
 
         public abstract Bitmap DrawPreview(Size size);
         public abstract Bitmap DrawFractal(Size size);
