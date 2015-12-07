@@ -40,6 +40,7 @@
             this.fsWatch = new System.IO.FileSystemWatcher();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.lblStatus = new System.Windows.Forms.ToolStripStatusLabel();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pbPreview)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbFractal)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.fsWatch)).BeginInit();
@@ -169,11 +170,22 @@
             this.lblStatus.Size = new System.Drawing.Size(39, 17);
             this.lblStatus.Text = "Ready";
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(13, 12);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 10;
+            this.button1.Text = "Fullscreen";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // Fractals
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1101, 737);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.pbFractal);
@@ -211,6 +223,7 @@
         private System.IO.FileSystemWatcher fsWatch;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel lblStatus;
+        private System.Windows.Forms.Button button1;
     }
 }
 

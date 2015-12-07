@@ -374,5 +374,11 @@ namespace ComplexFractals
                 e.Graphics.DrawRectangle(Pens.Gold, zoomed);
             }
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Fullscreen f = new Fullscreen(fractalRenderer, zooms);
+            f.ShowDialog();
+        }
     }
 }

@@ -14,8 +14,7 @@ namespace LocalRenderers
     public class LocalMandelbrotRenderer : AbstractRenderer
     {
         private const double ln2 = 0.693147180559945309417232121458176568075500134360255254120680; // Didn't bother with truncating the digits..
-
-        private CancellationTokenSource tokenSource;
+        
         private ConcurrentDictionary<int, CancellationTokenSource> activeTasks;
         private LocalRendererSettingsControl settingsControl;
 
