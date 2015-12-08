@@ -14,7 +14,7 @@ namespace LocalRenderers.Mandelbrot
         public bool BulbChecking { get; set; }
         public bool MultiThreaded { get; set; }
         public Size AntiAliasingScale { get; set; }
-        public ColoringAlgorithm Coloring { get; set; }
+        public MandelbrotColoringAlgorithm Coloring { get; set; }
         public AbstractRenderer.RenderAborted TaskAborted { get; set; }
         public AbstractRenderer.RenderComplete TaskComplete { get; set; }
         public AbstractRenderer.RenderProgress TaskProgress { get; set; }

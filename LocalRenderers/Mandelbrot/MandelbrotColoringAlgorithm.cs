@@ -1,10 +1,9 @@
-﻿namespace LocalRenderers
+﻿namespace LocalRenderers.Mandelbrot
 {
-    public enum ColoringAlgorithm
+    public enum MandelbrotColoringAlgorithm
     {
         FastIterGray,
         FastIterPalette,
-        SmoothIterGray,
         SmoothIterPalette,
     }
 }

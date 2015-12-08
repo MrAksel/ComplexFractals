@@ -16,12 +16,12 @@ namespace LocalRenderers.Mandelbrot
         private const double ln2 = 0.693147180559945309417232121458176568075500134360255254120680; // Didn't bother with truncating the digits..
         
         private ConcurrentDictionary<int, CancellationTokenSource> activeTasks;
-        private LocalRendererSettingsControl settingsControl;
+        private LocalMandelbrotRendererSettingsControl settingsControl;
 
         public LocalMandelbrotRenderer()
         {
             activeTasks = new ConcurrentDictionary<int, CancellationTokenSource>();
-            settingsControl = new LocalRendererSettingsControl(Fractal.Mandelbrot);
+            settingsControl = new LocalMandelbrotRendererSettingsControl();
         }
 
 
@@ -200,22 +200,13 @@ namespace LocalRenderers.Mandelbrot
                             switch (options.Coloring) // Branch prediction will guess correctly after a few tries, right?   
                             {
                                 default:
-                                case ColoringAlgorithm.FastIterGray:
+                                case MandelbrotColoringAlgorithm.FastIterGray:
                                     {
                                         byte val = (byte)(iter * 255 / options.Iterations);
                                         red = grn = blu = val;
                                         break;
                                     }
-                                case ColoringAlgorithm.SmoothIterGray:
-                                    {
-                                        double smooth = iter + 1 + ln2lnbailoverln2 - Math.Log(Math.Log(distsqr)) / ln2;
-                                        double p2 = smooth % 1;
-                                        double p1 = 1 - p2;
-                                        byte val = (byte)((iter * 255 * p1 + (iter + 1) * 255 * p2) / options.Iterations);
-                                        red = grn = blu = val;
-                                        break;
-                                    }
-                                case ColoringAlgorithm.FastIterPalette:
+                                case MandelbrotColoringAlgorithm.FastIterPalette:
                                     {
                                         int col = iter % options.Palette.Length;
                                         Color color = options.Palette[col];
@@ -224,7 +215,7 @@ namespace LocalRenderers.Mandelbrot
                                         blu = color.B;
                                         break;
                                     }
-                                case ColoringAlgorithm.SmoothIterPalette:
+                                case MandelbrotColoringAlgorithm.SmoothIterPalette:
                                     {
                                         double smooth = iter + 1 + ln2lnbailoverln2 - Math.Log(Math.Log(distsqr)) / ln2;
                                         double p2 = smooth % 1;
@@ -305,10 +296,8 @@ namespace LocalRenderers.Mandelbrot
         {
             MandelbrotTaskOptions opt = CreateRenderOptions(size); // Creates options based on the settings control
 
-            if (opt.Coloring == ColoringAlgorithm.SmoothIterPalette)
-                opt.Coloring = ColoringAlgorithm.FastIterPalette;
-            if (opt.Coloring == ColoringAlgorithm.SmoothIterGray)
-                opt.Coloring = ColoringAlgorithm.FastIterGray;
+            if (opt.Coloring == MandelbrotColoringAlgorithm.SmoothIterPalette)
+                opt.Coloring = MandelbrotColoringAlgorithm.FastIterPalette;
 
             opt.AntiAliasingScale = new Size(1, 1);
             opt.Iterations = (int)Math.Pow(settingsControl.Iterations, 2.0 / 3.0);

@@ -7,24 +7,25 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.IO;
 using System.Diagnostics;
+using LocalRenderers.Mandelbrot;
 
 namespace LocalRenderers
 {
-    public partial class LocalRendererSettingsControl : SettingsWindow
+    public partial class LocalMandelbrotRendererSettingsControl : SettingsWindow
     {
         private Dictionary<TextBox, string> texts;
 
-        public LocalRendererSettingsControl(Fractal fractal)
+        public LocalMandelbrotRendererSettingsControl()
         {
             InitializeComponent();
 
             nmrIter.Maximum = int.MaxValue;
             nmrUpdates.Maximum = int.MaxValue;
 
-            cbColoring.Items.AddRange(Enum.GetNames(typeof(ColoringAlgorithm)));
-            
-            cbColoring.SelectedIndex = 3;
-            
+            cbColoring.Items.AddRange(Enum.GetNames(typeof(MandelbrotColoringAlgorithm)));
+
+            cbColoring.SelectedIndex = 2;
+
             texts = new Dictionary<TextBox, string>();
             texts.Add(textBox1, "");
             texts.Add(textBox2, "");
@@ -32,7 +33,7 @@ namespace LocalRenderers
             texts.Add(textBox4, "");
             texts.Add(tbssW, "");
             texts.Add(tbssH, "");
-            
+
             textBox1.Text = (-2.5).ToString();
             textBox2.Text = (-1.2).ToString();
             textBox3.Text = (+1.5).ToString();
@@ -61,15 +62,15 @@ namespace LocalRenderers
             }
         }
 
-        public ColoringAlgorithm Coloring
+        public MandelbrotColoringAlgorithm Coloring
         {
             get
             {
-                ColoringAlgorithm res;
+                MandelbrotColoringAlgorithm res;
                 if (Enum.TryParse(cbColoring.SelectedItem.ToString(), out res))
                     return res;
                 else
-                    return ColoringAlgorithm.FastIterPalette;
+                    return MandelbrotColoringAlgorithm.FastIterPalette;
             }
         }
 
@@ -136,18 +137,12 @@ namespace LocalRenderers
             }
         }
 
-        public string Function { get; internal set; }
-        public string Derivative { get; internal set; }
-
-        public double Tolerance { get; internal set; }
-        public Complex Multiplier { get; internal set; }
-
         private void LoadPalette()
         {
             List<Color> colors = new List<Color>();
             try
             {
-                using (FileStream fs = new FileStream("palette.txt", FileMode.Open))
+                using (FileStream fs = new FileStream("mandelbrot.txt", FileMode.Open))
                 using (StreamReader sr = new StreamReader(fs))
                 {
                     string line = "";
@@ -189,7 +184,7 @@ namespace LocalRenderers
         {
             try
             {
-                using (FileStream fs = new FileStream("palette.txt", FileMode.Create))
+                using (FileStream fs = new FileStream("mandelbrot.txt", FileMode.Create))
                 using (StreamWriter sw = new StreamWriter(fs))
                 {
                     foreach (Color c in Palette)
@@ -234,7 +229,7 @@ namespace LocalRenderers
         private void flpPalette_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             AddControl(Color.White);
-            if (Coloring == ColoringAlgorithm.FastIterPalette || Coloring == ColoringAlgorithm.SmoothIterPalette)
+            if (Coloring == MandelbrotColoringAlgorithm.FastIterPalette || Coloring == MandelbrotColoringAlgorithm.SmoothIterPalette)
             {
                 OnSettingsChanged(true);
             }
@@ -253,7 +248,7 @@ namespace LocalRenderers
 
         private void PaletteChange(ColorPicker picker)
         {
-            if (Coloring == ColoringAlgorithm.FastIterPalette || Coloring == ColoringAlgorithm.SmoothIterPalette)
+            if (Coloring == MandelbrotColoringAlgorithm.FastIterPalette || Coloring == MandelbrotColoringAlgorithm.SmoothIterPalette)
             {
                 OnSettingsChanged(true);
             }

@@ -13,15 +13,13 @@ namespace LocalRenderers.Newton
         public int Iterations { get; set; }
         public bool MultiThreaded { get; set; }
         public Size AntiAliasingScale { get; set; }
-        public ColoringAlgorithm Coloring { get; set; }
+        public NewtonColoringAlgorithm Coloring { get; set; }
         public AbstractRenderer.RenderAborted TaskAborted { get; set; }
         public AbstractRenderer.RenderComplete TaskComplete { get; set; }
         public AbstractRenderer.RenderProgress TaskProgress { get; set; }
-
-        public Color[] Palette { get; set; }
-
-        public string Function { get; set; }
-        public string Derivative { get; set; }
+        
+        public Func<Complex, Complex, Complex> Function { get; set; }
+        public Func<Complex, Complex, Complex> Derivative { get; set; }
         public double Tolerance { get; set; }
         public Complex Multiplier { get; set; }
 
@@ -49,6 +47,8 @@ namespace LocalRenderers.Newton
             }
         }
 
+        public Color DivergeColor { get; internal set; }
+
         public NewtonTaskOptions Clone()
         {
             NewtonTaskOptions opt = new NewtonTaskOptions();
@@ -66,13 +66,6 @@ namespace LocalRenderers.Newton
             opt.MultiThreaded = MultiThreaded;
             opt.AntiAliasingScale = AntiAliasingScale;
             opt.User = User;
-
-            if (Palette != null)
-            {
-                opt.Palette = new Color[Palette.Length];
-                Array.Copy(Palette, opt.Palette, Palette.Length);
-            }
-
             opt.Min = Min;
             opt.Max = Max;
 

@@ -12,18 +12,18 @@ using System.Drawing.Imaging;
 
 namespace LocalRenderers.Newton
 {
-    [FractalRenderer("Newton", "Local renderer", false)]
+    [FractalRenderer("Newton", "Local renderer", true)]
     public class LocalNewtonRenderer : AbstractRenderer
     {
         private const double ln2 = 0.693147180559945309417232121458176568075500134360255254120680; // Didn't bother with truncating the digits..
 
         private ConcurrentDictionary<int, CancellationTokenSource> activeTasks;
-        private LocalRendererSettingsControl settingsControl;
+        private LocalNewtonRendererSettingsControl settingsControl;
 
         public LocalNewtonRenderer()
         {
             activeTasks = new ConcurrentDictionary<int, CancellationTokenSource>();
-            settingsControl = new LocalRendererSettingsControl(Fractal.Newton);
+            settingsControl = new LocalNewtonRendererSettingsControl();
         }
 
 
@@ -143,6 +143,12 @@ namespace LocalRenderers.Newton
             float pxTot = bd.Width * bd.Height;
             int updateinc = (progress ? (int)(pxTot / options.Updates) : int.MaxValue);
             int nextupdate = updateinc;
+
+            bool smooth = (options.Coloring == NewtonColoringAlgorithm.Smooth);
+
+            Func<Complex, Complex, Complex> F = options.Function;
+            Func<Complex, Complex, Complex> Fdz = options.Derivative;
+
             Action<Tuple<int, int, int, int>> worker = new Action<Tuple<int, int, int, int>>((offset) =>
             {
                 int xoff = offset.Item1;
@@ -170,12 +176,56 @@ namespace LocalRenderers.Newton
                         double distsqr = rr + ii;
 
                         // TODO Loop on r and i
+                        Complex c = new Complex(r, i);
+                        Complex z = new Complex(r, i);
+                        Complex dz;
+                        Complex e = Complex.Zero;
+                        double sm = 0.0;
+                        int iter = 0;
+                        while (iter < options.Iterations)
+                        {
+                            dz = Fdz(z, c);
+                            if (dz.Magnitude < options.Tolerance)
+                            {
+                                //z = z + 1;
+                                //continue;
+                            }
+                            e = -(F(z, c) / dz);
+                            z += e;
+
+                            if (smooth)
+                                sm = sm + Math.Pow(Math.E, -Complex.Abs(Complex.Divide(1.0, -e)));
+                            iter++;
+                            if (e.Magnitude < options.Tolerance)
+                            {
+                                break;
+                            }
+                        }
 
                         // TODO Colorize based on root and convergence rate
-
+                        Color root = options.DivergeColor;
+                        if (iter < options.Iterations)
+                        {
+                            // root = options.Palette[iter % (options.Palette.Length - 1) + 1];
+                            double hue = z.Phase * 180 / Math.PI;
+                            while (hue < 0)
+                                hue += 360;
+                            double sat = 1.0 / (1 + Math.Exp(-z.Magnitude)); // Squash magnitude to (0, 1)
+                            root = ColorFromHSV(hue, sat, 1.0);
+                        }
                         byte red, grn, blu;
-
                         red = grn = blu = 0;
+                        switch (options.Coloring)
+                        {
+                            case NewtonColoringAlgorithm.Smooth:
+                                {
+                                    double p1 = 1 - sm % 1;
+                                    red = (byte)(root.R * p1);
+                                    grn = (byte)(root.G * p1);
+                                    blu = (byte)(root.B * p1);
+                                    break;
+                                }
+                        }
 
                         px[0] = blu;
                         px[1] = grn;
@@ -238,11 +288,6 @@ namespace LocalRenderers.Newton
         {
             NewtonTaskOptions opt = CreateRenderOptions(size); // Creates options based on the settings control
 
-            if (opt.Coloring == ColoringAlgorithm.SmoothIterPalette)
-                opt.Coloring = ColoringAlgorithm.FastIterPalette;
-            if (opt.Coloring == ColoringAlgorithm.SmoothIterGray)
-                opt.Coloring = ColoringAlgorithm.FastIterGray;
-
             opt.AntiAliasingScale = new Size(1, 1);
             opt.Iterations = (int)Math.Pow(settingsControl.Iterations, 2.0 / 3.0);
             opt.MultiThreaded = false;
@@ -257,7 +302,6 @@ namespace LocalRenderers.Newton
             opt.Min = settingsControl.Min;
             opt.Max = settingsControl.Max;
             opt.Updates = settingsControl.Updates;
-            opt.Palette = settingsControl.Palette;
             opt.Coloring = settingsControl.Coloring;
             opt.Function = settingsControl.Function;
             opt.Tolerance = settingsControl.Tolerance;
@@ -313,14 +357,42 @@ namespace LocalRenderers.Newton
 
         public override void SetClip(Complex min, Complex max)
         {
+            settingsControl.update = false;
             settingsControl.Min = min;
             settingsControl.Max = max;
+            settingsControl.update = true;
         }
 
         public override void GetClip(out Complex min, out Complex max)
         {
             min = settingsControl.Min;
             max = settingsControl.Max;
+        }
+
+
+        private static Color ColorFromHSV(double hue, double saturation, double value)
+        {
+            int hi = Convert.ToInt32(Math.Floor(hue / 60)) % 6;
+            double f = hue / 60 - Math.Floor(hue / 60);
+
+            value = value * 255;
+            int v = Convert.ToInt32(value);
+            int p = Convert.ToInt32(value * (1 - saturation));
+            int q = Convert.ToInt32(value * (1 - f * saturation));
+            int t = Convert.ToInt32(value * (1 - (1 - f) * saturation));
+
+            if (hi == 0)
+                return Color.FromArgb(255, v, t, p);
+            else if (hi == 1)
+                return Color.FromArgb(255, q, v, p);
+            else if (hi == 2)
+                return Color.FromArgb(255, p, v, t);
+            else if (hi == 3)
+                return Color.FromArgb(255, p, q, v);
+            else if (hi == 4)
+                return Color.FromArgb(255, t, p, v);
+            else
+                return Color.FromArgb(255, v, p, q);
         }
     }
 }

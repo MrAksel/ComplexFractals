@@ -1,6 +1,6 @@
 ﻿namespace LocalRenderers
 {
-    partial class LocalRendererSettingsControl
+    partial class LocalMandelbrotRendererSettingsControl
     {
         /// <summary> 
         /// Required designer variable.
