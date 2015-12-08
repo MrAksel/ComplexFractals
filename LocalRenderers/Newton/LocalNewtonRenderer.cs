@@ -194,7 +194,7 @@ namespace LocalRenderers.Newton
                             z += e;
 
                             if (smooth)
-                                sm = sm + Math.Pow(Math.E, -Complex.Abs(Complex.Divide(1.0, -e)));
+                                sm = sm + Math.Pow(Math.E, -Complex.Abs(Complex.Divide(1.0, e)));
                             iter++;
                             if (e.Magnitude < options.Tolerance)
                             {
@@ -289,9 +289,7 @@ namespace LocalRenderers.Newton
             NewtonTaskOptions opt = CreateRenderOptions(size); // Creates options based on the settings control
 
             opt.AntiAliasingScale = new Size(1, 1);
-            opt.Iterations = (int)Math.Pow(settingsControl.Iterations, 2.0 / 3.0);
-            opt.MultiThreaded = false;
-
+            
             return opt;
         }
 

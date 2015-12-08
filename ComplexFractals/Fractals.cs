@@ -203,6 +203,7 @@ namespace ComplexFractals
             {
                 foreach (SettingsWindow w in gbSettings.Controls)
                     w.SettingsChanged -= SettingsChanged;
+                gbSettings.Controls.Clear();
             }
 
             SettingsWindow settings = fractalRenderer.GetSettingsWindow();

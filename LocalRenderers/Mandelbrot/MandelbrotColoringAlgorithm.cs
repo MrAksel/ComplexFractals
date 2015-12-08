@@ -5,5 +5,6 @@
         FastIterGray,
         FastIterPalette,
         SmoothIterPalette,
+        ComplexArgument,
     }
 }
